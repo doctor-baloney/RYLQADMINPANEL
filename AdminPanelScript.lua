@@ -158,5 +158,56 @@ end)
 UIS.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.F then
         frame.Visible = not frame.Visible
+              ["God Mode"] = function()
+        local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+        humanoid.MaxHealth = math.huge
+        humanoid.Health = math.huge
+        humanoid.PlatformStand = true
+    end,
+
+    ["Noclip"] = function()
+        local character = game.Players.LocalPlayer.Character
+        if not character then return end
+
+        local function setNoclip(value)
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not value
+                end
+            end
+        end
+
+        -- Toggle Noclip
+        local noclip = false
+        while true do
+            setNoclip(noclip)
+            wait(0.1)
+            noclip = not noclip
+        end
+    end,
+
+    ["Invisible"] = function()
+        local character = game.Players.LocalPlayer.Character
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Transparency = 1
+            end
+        end
+        game.Players.LocalPlayer.Character.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+    end,
+}
+
+-- Adding more functionality to the input box or command handler
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.F then
+            -- Trigger the fly command
+            pcall(function()
+                commands["Fly"]()
+            end)
+        end
+    end
+end)
     end
 end)
