@@ -1,164 +1,113 @@
--- Admin Panel Script for Delta Executor
+-- Admin Panel GUI Setup
+local Player = game.Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = PlayerGui
+ScreenGui.Name = "RYLQ_AdminPanel"
+ScreenGui.ResetOnSpawn = false
 
-local player = game.Players.LocalPlayer
-local mouse = player:GetMouse()
-local gui = Instance.new("ScreenGui", player.PlayerGui)
-gui.Name = "AdminPanel"
-gui.ResetOnSpawn = false
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Black Background
+Frame.BorderSizePixel = 0
+Frame.Size = UDim2.new(0, 300, 0, 500)
+Frame.Position = UDim2.new(0, 20, 0, 100)
 
--- Create the main panel
-local panel = Instance.new("Frame", gui)
-panel.Size = UDim2.new(0, 300, 0, 500)  -- Increased size to accommodate more buttons
-panel.Position = UDim2.new(0.5, -150, 0.5, -200)
-panel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-panel.BorderSizePixel = 0
-panel.Visible = true
+local Title = Instance.new("TextLabel")
+Title.Parent = Frame
+Title.Text = "RYLQ'S ADMIN PANEL"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)  -- White Text
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.Legacy
+Title.TextSize = 24
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.TextAlign = Enum.TextXAlignment.Center
 
--- Panel title
-local title = Instance.new("TextLabel", panel)
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Text = "Admin Panel"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 24
-title.BackgroundTransparency = 1
+local FlyButton = Instance.new("TextButton")
+FlyButton.Parent = Frame
+FlyButton.Text = "Fly"
+FlyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlyButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Button background black
+FlyButton.BorderColor3 = Color3.fromRGB(255, 0, 0)  -- Red Border
+FlyButton.Size = UDim2.new(0, 200, 0, 50)
+FlyButton.Position = UDim2.new(0, 50, 0, 100)
+FlyButton.Font = Enum.Font.Legacy
+FlyButton.TextSize = 18
 
--- Add a UIListLayout for easy positioning
-local layout = Instance.new("UIListLayout", panel)
-layout.Padding = UDim.new(0, 5)
-layout.FillDirection = Enum.FillDirection.Vertical
+local SpeedButton = Instance.new("TextButton")
+SpeedButton.Parent = Frame
+SpeedButton.Text = "Speed"
+SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Button background black
+SpeedButton.BorderColor3 = Color3.fromRGB(255, 0, 0)  -- Red Border
+SpeedButton.Size = UDim2.new(0, 200, 0, 50)
+SpeedButton.Position = UDim2.new(0, 50, 0, 160)
+SpeedButton.Font = Enum.Font.Legacy
+SpeedButton.TextSize = 18
 
--- Function to create buttons dynamically
-local function createButton(text, callback)
-    local button = Instance.new("TextButton", panel)
-    button.Size = UDim2.new(1, 0, 0, 50)
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 18
-    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    button.BorderSizePixel = 0
-    button.MouseButton1Click:Connect(callback)
+-- Fly Functionality
+local flying = false
+local bodyGyro, bodyVelocity
+local speed = 50
+local ctrl = {f = 0, b = 0, l = 0, r = 0}
+local lastCtrl = {f = 0, b = 0, l = 0, r = 0}
+
+local function Fly()
+    local character = Player.Character
+    local humanoid = character and character:FindFirstChild("Humanoid")
+    local torso = character and character:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid or not torso then return end
+
+    bodyGyro = Instance.new("BodyGyro", torso)
+    bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+    bodyGyro.P = 10000
+    bodyGyro.CFrame = torso.CFrame
+
+    bodyVelocity = Instance.new("BodyVelocity", torso)
+    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+    bodyVelocity.Velocity = Vector3.new(0, 0.1, 0)
+
+    humanoid.PlatformStand = true
+
+    while flying do
+        wait(0.1)
+        local lookVector = game.Workspace.CurrentCamera.CFrame.lookVector
+        local moveVector = (lookVector * (ctrl.f + ctrl.b)) + ((game.Workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CFrame.p)
+        bodyVelocity.Velocity = moveVector * speed
+
+        if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+            speed = math.min(speed + 0.5 + (speed / 50), 100)
+        elseif ctrl.l + ctrl.r == 0 and ctrl.f + ctrl.b == 0 then
+            speed = math.max(speed - 1, 0)
+        end
+
+        bodyGyro.CFrame = game.Workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / 100), 0, 0)
+    end
+
+    bodyGyro:Destroy()
+    bodyVelocity:Destroy()
+    humanoid.PlatformStand = false
 end
 
--- Function for teleporting the player to a location
-createButton("Teleport to Spawn", function()
-    local spawn = game.Workspace:FindFirstChild("SpawnLocation")
-    if spawn then
-        player.Character:SetPrimaryPartCFrame(spawn.CFrame)
-    else
-        warn("SpawnLocation not found")
-    end
-end)
-
--- Function for flying
-local flying = false
-local speed = 50
-local bodyVelocity
-local bodyGyro
-
-createButton("Toggle Fly", function()
+FlyButton.MouseButton1Click:Connect(function()
+    flying = not flying
     if flying then
-        flying = false
-        if bodyVelocity then bodyVelocity:Destroy() end
-        if bodyGyro then bodyGyro:Destroy() end
-        player.Character.Humanoid.PlatformStand = false
-    else
-        flying = true
-        local character = player.Character
-        local torso = character:WaitForChild("HumanoidRootPart")
-
-        bodyGyro = Instance.new("BodyGyro", torso)
-        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-        bodyGyro.CFrame = torso.CFrame
-
-        bodyVelocity = Instance.new("BodyVelocity", torso)
-        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-
-        bodyGyro.CFrame = torso.CFrame
-        bodyVelocity.Velocity = Vector3.new(0, 1, 0) * speed
-
-        player.Character.Humanoid.PlatformStand = true
+        Fly()
     end
 end)
 
--- Function to change speed
-local playerSpeed = 16  -- Default speed in Roblox
-createButton("Increase Speed", function()
-    playerSpeed = playerSpeed + 5
-    player.Character.Humanoid.WalkSpeed = playerSpeed
-    print("Current Speed: " .. playerSpeed)
+SpeedButton.MouseButton1Click:Connect(function()
+    speed = speed == 50 and 100 or 50  -- Toggle speed between 50 and 100
 end)
 
-createButton("Decrease Speed", function()
-    playerSpeed = playerSpeed - 5
-    if playerSpeed < 16 then
-        playerSpeed = 16  -- Prevent speed from going below the default
-    end
-    player.Character.Humanoid.WalkSpeed = playerSpeed
-    print("Current Speed: " .. playerSpeed)
-end)
-
--- Function to toggle noclip (no collision with parts)
-local noclip = false
-createButton("Toggle Noclip", function()
-    noclip = not noclip
-    local character = player.Character
-    local humanoid = character:FindFirstChild("Humanoid")
-    
-    if noclip then
-        humanoid.PlatformStand = true
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("Part") then
-                part.CanCollide = false
-            end
-        end
-    else
-        humanoid.PlatformStand = false
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("Part") then
-                part.CanCollide = true
-            end
-        end
+-- GUI Toggle with E key
+local guiVisible = true
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E then
+        guiVisible = not guiVisible
+        ScreenGui.Enabled = guiVisible
     end
 end)
 
--- Function to kill the player (suicide)
-createButton("Kill Player", function()
-    player.Character:BreakJoints()
-end)
-
--- Function to clear player's tools
-createButton("Clear Tools", function()
-    for _, tool in pairs(player.Backpack:GetChildren()) do
-        if tool:IsA("Tool") then
-            tool:Destroy()
-        end
-    end
-end)
-
--- Function to mute the player (stop sound)
-createButton("Mute Player", function()
-    local character = player.Character
-    if character then
-        for _, sound in pairs(character:GetDescendants()) do
-            if sound:IsA("Sound") then
-                sound:Stop()
-            end
-        end
-    end
-end)
-
--- Function to teleport to a random player
-createButton("Teleport to Random Player", function()
-    local allPlayers = game.Players:GetPlayers()
-    local randomPlayer = allPlayers[math.random(1, #allPlayers)]
-    if randomPlayer.Character then
-        player.Character:SetPrimaryPartCFrame(randomPlayer.Character.HumanoidRootPart.CFrame)
-    end
-end)
-
--- Make the admin panel draggable
-panel.Active = true
-panel.Draggable = true
+-- Add more commands if needed
