@@ -1,109 +1,149 @@
-local Players, UIS, TweenService, Workspace = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("TweenService"), game:GetService("Workspace")
-local lp = Players.LocalPlayer
-local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
-gui.Name, gui.ResetOnSpawn = "RYLQAdminPanel", false
+-- Instances
+local FlyScript = Instance.new("ScreenGui")
+local Gradient = Instance.new("Frame")
+local UIGradient = Instance.new("UIGradient")
+local UICorner = Instance.new("UICorner")
+local Button = Instance.new("TextButton")
+local Shadow = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
 
-local function createUICorner(parent, rad) 
-    local c = Instance.new("UICorner", parent) 
-    c.CornerRadius = UDim.new(0, rad or 10) 
-end
+-- Properties
+FlyScript.Name = "FlyScript"
+FlyScript.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+FlyScript.ResetOnSpawn = false
 
-local frame = Instance.new("Frame", gui)
-frame.Size, frame.Position, frame.BackgroundColor3, frame.Active, frame.Draggable = UDim2.fromOffset(320, 460), UDim2.new(0, 50, 0.5, -230), Color3.new(), true, true
+Gradient.Name = "Gradient"
+Gradient.Parent = FlyScript
+Gradient.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Gradient.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Gradient.BorderSizePixel = 0
+Gradient.Position = UDim2.new(0.0199062824, 0, 0.781767964, 0)
+Gradient.Size = UDim2.new(0, 231, 0, 81)
 
-local title = Instance.new("TextLabel", frame)
-title.Size, title.Text, title.TextColor3, title.Font, title.TextSize, title.BackgroundColor3 = UDim2.new(1, 0, 0, 40), "RYLQ'S ADMIN PANEL", Color3.new(1,1,1), Enum.Font.Legacy, 20, Color3.fromRGB(30,30,30)
+UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(57, 104, 252)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(51, 68, 175))}
+UIGradient.Parent = Gradient
 
-local scroll = Instance.new("ScrollingFrame", frame)
-scroll.Size, scroll.Position, scroll.CanvasSize, scroll.ScrollBarThickness, scroll.BackgroundTransparency = UDim2.new(1, 0, 1, -100), UDim2.new(0, 0, 0, 40), UDim2.new(), 6, 1
-local layout = Instance.new("UIListLayout", scroll)
-layout.Padding, layout.SortOrder = UDim.new(0, 4), Enum.SortOrder.LayoutOrder
+UICorner.CornerRadius = UDim.new(0.0399999991, 0)
+UICorner.Parent = Gradient
 
-local commands = {
-    ["Speed"] = function(v) 
-        lp.Character.Humanoid.WalkSpeed = tonumber(v) or 50
-    end,
-    ["JumpPower"] = function(v) 
-        lp.Character.Humanoid.JumpPower = tonumber(v) or 150
-    end,
-    ["Reset Speed"] = function() 
-        lp.Character.Humanoid.WalkSpeed = 16
-    end,
-    ["Reset Jump"] = function() 
-        lp.Character.Humanoid.JumpPower = 50
-    end,
-    ["Fly"] = function()
-        -- Fly functionality
-        local plr = game.Players.LocalPlayer
-        local torso = plr.Character:WaitForChild("Torso")
-        local mouse = plr:GetMouse()
+Button.Name = "Button"
+Button.Parent = Gradient
+Button.BackgroundColor3 = Color3.fromRGB(77, 100, 150)
+Button.BorderSizePixel = 0
+Button.Position = UDim2.new(0.0921155736, 0, 0.238353431, 0)
+Button.Size = UDim2.new(0, 187, 0, 41)
+Button.ZIndex = 2
+Button.Font = Enum.Font.GothamSemibold
+Button.Text = ""
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.TextScaled = true
+Button.TextSize = 14.000
+Button.TextWrapped = true
 
-        local flying = false
-        local ctrl = {f = 0, b = 0, l = 0, r = 0}
-        local maxspeed = 50
-        local speed = 0
-        local bg, bv
+Shadow.Name = "Shadow"
+Shadow.Parent = Button
+Shadow.BackgroundColor3 = Color3.fromRGB(53, 69, 103)
+Shadow.BorderSizePixel = 0
+Shadow.Size = UDim2.new(1, 0, 1, 4)
 
-        -- Actual flying function
-        local function Fly()
-            game.StarterGui:SetCore("SendNotification", {Title="Fly Activated"; Text="WeAreDevs.net"; Duration=1;})
-            bg = Instance.new("BodyGyro", torso)
-            bg.P = 9e4
-            bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-            bg.cframe = torso.CFrame
-            bv = Instance.new("BodyVelocity", torso)
-            bv.velocity = Vector3.new(0,0.1,0)
-            bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-            repeat
-                wait()
-                plr.Character.Humanoid.PlatformStand = true
-                if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                    speed = speed + 0.5 + (speed / maxspeed)
-                    if speed > maxspeed then
-                        speed = maxspeed
-                    end
-                elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-                    speed = speed - 1
-                    if speed < 0 then
-                        speed = 0
-                    end
+TextLabel.Parent = Gradient
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0.487012982, 0, 0.5, 0)
+TextLabel.Size = UDim2.new(0.878787875, -20, 0.728395045, -20)
+TextLabel.ZIndex = 2
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.Text = "Fly"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+
+Button.MouseButton1Down:connect(function()
+    -- Wait until player and necessary components are loaded
+    repeat wait() until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+    local mouse = game.Players.LocalPlayer:GetMouse()
+
+    -- Flying variables
+    local plr = game.Players.LocalPlayer
+    local torso = plr.Character.HumanoidRootPart
+    local flying = false
+    local speed = 0
+    local maxSpeed = 100
+    local acceleration = 5
+    local deceleration = 5
+    local hoverHeight = 5
+    local bg = nil
+    local bv = nil
+    local ctrl = {f = 0, b = 0, l = 0, r = 0}
+
+    -- Start the flying function
+    local function startFlying()
+        -- Create BodyGyro and BodyVelocity
+        bg = Instance.new("BodyGyro", torso)
+        bg.P = 9e4
+        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bg.cframe = torso.CFrame
+
+        bv = Instance.new("BodyVelocity", torso)
+        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.velocity = Vector3.new(0, 0.1, 0)  -- Starting velocity
+
+        -- Keep flying
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if flying then
+                -- Control speed and movement
+                local moveDirection = (game.Workspace.CurrentCamera.CoordinateFrame.LookVector * (ctrl.f + ctrl.b)) +
+                                      (game.Workspace.CurrentCamera.CoordinateFrame.RightVector * (ctrl.l + ctrl.r))
+                bv.velocity = moveDirection * speed + Vector3.new(0, hoverHeight, 0)
+
+                -- Smooth acceleration and deceleration
+                if ctrl.f + ctrl.b ~= 0 or ctrl.l + ctrl.r ~= 0 then
+                    speed = math.min(speed + acceleration, maxSpeed)  -- Gradual speed increase
+                elseif speed > 0 then
+                    speed = math.max(speed - deceleration, 0)  -- Gradual speed decrease
                 end
-                if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-                    bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
-                else
-                    bv.velocity = Vector3.new(0, 0.1, 0)
-                end
-                bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
-            until not flying
-            ctrl = {f = 0, b = 0, l = 0, r = 0}
-            speed = 0
-            bg:Destroy()
-            bv:Destroy()
-            plr.Character.Humanoid.PlatformStand = false
-            game.StarterGui:SetCore("SendNotification", {Title="Fly Deactivated"; Text="WeAreDevs.net"; Duration=1;})
-        end
 
-        -- Control bindings
-        mouse.KeyDown:connect(function(key)
+                -- Update BodyGyro's CFrame
+                bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 5), 0, 0)
+            else
+                -- If not flying, reset speed and remove BodyGyro/BodyVelocity
+                speed = 0
+                if bg then bg:Destroy() end
+                if bv then bv:Destroy() end
+            end
+        end)
+    end
+
+    -- Handle input controls for flying
+    local function handleControls()
+        -- KeyPress event for moving the player while flying
+        mouse.KeyDown:Connect(function(key)
             if key:lower() == "e" then
+                -- Toggle flying
+                flying = not flying
                 if flying then
-                    flying = false
+                    startFlying()
                 else
-                    flying = true
-                    Fly()
+                    if bg then bg:Destroy() end
+                    if bv then bv:Destroy() end
                 end
             elseif key:lower() == "w" then
-                ctrl.f = 1
+                ctrl.f = 1  -- Move forward
             elseif key:lower() == "s" then
-                ctrl.b = -1
+                ctrl.b = -1  -- Move backward
             elseif key:lower() == "a" then
-                ctrl.l = -1
+                ctrl.l = -1  -- Move left
             elseif key:lower() == "d" then
-                ctrl.r = 1
+                ctrl.r = 1  -- Move right
             end
         end)
 
-        mouse.KeyUp:connect(function(key)
+        -- KeyRelease event to stop movement
+        mouse.KeyUp:Connect(function(key)
             if key:lower() == "w" then
                 ctrl.f = 0
             elseif key:lower() == "s" then
@@ -114,100 +154,8 @@ local commands = {
                 ctrl.r = 0
             end
         end)
-    end,
-}
-
-for name, func in pairs(commands) do
-    local btn = Instance.new("TextButton", scroll)
-    btn.Size, btn.Text, btn.TextColor3, btn.Font, btn.TextSize = UDim2.new(1, -10, 0, 40), name, Color3.new(1,1,1), Enum.Font.Legacy, 18
-    btn.Position, btn.BackgroundColor3, btn.AutoButtonColor = UDim2.new(0, 5, 0, 0), Color3.fromRGB(200,0,0), false
-    createUICorner(btn)
-
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 30, 30)}):Play()
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(200, 0, 0)}):Play()
-    end)
-    btn.MouseButton1Click:Connect(function() pcall(func) end)
-end
-
-scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
-end)
-
-local input = Instance.new("TextBox", frame)
-input.Size, input.Position, input.PlaceholderText = UDim2.new(1, -20, 0, 40), UDim2.new(0, 10, 1, -50), "Type command (e.g. :speed 100)"
-input.Font, input.TextSize, input.TextColor3, input.BackgroundColor3 = Enum.Font.Legacy, 18, Color3.new(1,1,1), Color3.fromRGB(20, 20, 20)
-input.BorderSizePixel, input.ClearTextOnFocus = 0, false
-createUICorner(input, 8)
-
-input.FocusLost:Connect(function(enter)
-    if not enter then return end
-    local args = input.Text:split(" ")
-    local cmd, val = args[1]:gsub(":", ""):lower(), args[2]
-    for k, f in pairs(commands) do
-        if cmd == k:lower():gsub(" ", "") then
-            pcall(f, val)
-        end
     end
-    input.Text = ""
-end)
 
-UIS.InputBegan:Connect(function(i, g)
-    if not g and i.KeyCode == Enum.KeyCode.F then
-        frame.Visible = not frame.Visible
-              ["God Mode"] = function()
-        local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
-        humanoid.MaxHealth = math.huge
-        humanoid.Health = math.huge
-        humanoid.PlatformStand = true
-    end,
-
-    ["Noclip"] = function()
-        local character = game.Players.LocalPlayer.Character
-        if not character then return end
-
-        local function setNoclip(value)
-            for _, part in pairs(character:GetChildren()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = not value
-                end
-            end
-        end
-
-        -- Toggle Noclip
-        local noclip = false
-        while true do
-            setNoclip(noclip)
-            wait(0.1)
-            noclip = not noclip
-        end
-    end,
-
-    ["Invisible"] = function()
-        local character = game.Players.LocalPlayer.Character
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.Transparency = 1
-            end
-        end
-        game.Players.LocalPlayer.Character.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-    end,
-}
-
--- Adding more functionality to the input box or command handler
-
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Keyboard then
-        if input.KeyCode == Enum.KeyCode.F then
-            -- Trigger the fly command
-            pcall(function()
-                commands["Fly"]()
-            end)
-        end
-    end
-end)
-    end
+    -- Initialize the flying control
+    handleControls()
 end)
