@@ -1,147 +1,125 @@
--- Variables for GUI
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = playerGui
-screenGui.ResetOnSpawn = false
-
-local frame = Instance.new("Frame")
-frame.Parent = screenGui
-frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- black background
-frame.BorderSizePixel = 2
-frame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- red border
-
-local title = Instance.new("TextLabel")
-title.Parent = frame
-title.Size = UDim2.new(1, 0, 0, 50)
-title.BackgroundTransparency = 1
-title.Text = "RYLQ'S ADMIN PANEL"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 24
-title.Font = Enum.Font.Legacy
-title.TextAlign = Enum.TextAlign.Center
-
-local buttonFly = Instance.new("TextButton")
-buttonFly.Parent = frame
-buttonFly.Size = UDim2.new(1, -20, 0, 50)
-buttonFly.Position = UDim2.new(0, 10, 0, 60)
-buttonFly.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-buttonFly.Text = "Toggle Fly"
-buttonFly.TextColor3 = Color3.fromRGB(255, 255, 255)
-buttonFly.TextSize = 20
-buttonFly.Font = Enum.Font.Legacy
-
-local buttonSpeed = Instance.new("TextButton")
-buttonSpeed.Parent = frame
-buttonSpeed.Size = UDim2.new(1, -20, 0, 50)
-buttonSpeed.Position = UDim2.new(0, 10, 0, 120)
-buttonSpeed.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-buttonSpeed.Text = "Toggle Speed"
-buttonSpeed.TextColor3 = Color3.fromRGB(255, 255, 255)
-buttonSpeed.TextSize = 20
-buttonSpeed.Font = Enum.Font.Legacy
-
-local buttonNoclip = Instance.new("TextButton")
-buttonNoclip.Parent = frame
-buttonNoclip.Size = UDim2.new(1, -20, 0, 50)
-buttonNoclip.Position = UDim2.new(0, 10, 0, 180)
-buttonNoclip.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-buttonNoclip.Text = "Toggle Noclip"
-buttonNoclip.TextColor3 = Color3.fromRGB(255, 255, 255)
-buttonNoclip.TextSize = 20
-buttonNoclip.Font = Enum.Font.Legacy
-
--- Variables for fly functionality
-local flying = false
-local speed = 0
-local flySpeed = 50
-local bodyGyro, bodyVelocity
-
--- Variables for noclip
-local noclip = false
-
--- Fly function like Kohl's Admin
-local function fly()
-    local torso = player.Character:WaitForChild("HumanoidRootPart")
-    local humanoid = player.Character:WaitForChild("Humanoid")
-    
-    if flying then
-        bodyGyro = Instance.new("BodyGyro", torso)
-        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-        bodyGyro.CFrame = torso.CFrame
-        
-        bodyVelocity = Instance.new("BodyVelocity", torso)
-        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        
-        repeat wait()
-            humanoid.PlatformStand = true
-            bodyVelocity.Velocity = torso.CFrame.lookVector * flySpeed
-        until not flying
-        
-        bodyGyro:Destroy()
-        bodyVelocity:Destroy()
-        humanoid.PlatformStand = false
-    end
+-- RYLQ'S ADMIN PANEL (Custom Infinite Yield Style)
+if game.CoreGui:FindFirstChild("RYLQsAdmin") then
+    game.CoreGui:FindFirstChild("RYLQsAdmin"):Destroy()
 end
 
--- Speed function to modify player walk speed
-local function setSpeed(value)
-    local humanoid = player.Character:WaitForChild("Humanoid")
-    humanoid.WalkSpeed = value
-end
+-- UI Setup
+local RYLQAdmin = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CmdBox = Instance.new("TextBox")
+local Output = Instance.new("TextLabel")
 
--- Noclip function to enable/disable noclip mode
-local function toggleNoclip()
-    noclip = not noclip
-    local character = player.Character
-    local humanoid = character:WaitForChild("Humanoid")
+RYLQAdmin.Name = "RYLQsAdmin"
+RYLQAdmin.ResetOnSpawn = false
+RYLQAdmin.Parent = game.CoreGui
 
-    if noclip then
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
+Frame.Name = "Main"
+Frame.Parent = RYLQAdmin
+Frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- RED theme
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.25, 0, 0.25, 0)
+Frame.Size = UDim2.new(0, 400, 0, 250)
+Frame.Active = true
+Frame.Draggable = true
+
+Title.Name = "Title"
+Title.Parent = Frame
+Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White bar
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Font = Enum.Font.Legacy
+Title.Text = "RYLQ'S ADMIN PANEL"
+Title.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text
+Title.TextStrokeTransparency = 0
+Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextScaled = true
+
+CmdBox.Name = "CmdBox"
+CmdBox.Parent = Frame
+CmdBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CmdBox.Position = UDim2.new(0.05, 0, 0.25, 0)
+CmdBox.Size = UDim2.new(0.9, 0, 0, 40)
+CmdBox.Font = Enum.Font.Legacy
+CmdBox.PlaceholderText = "Enter a command..."
+CmdBox.Text = ""
+CmdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+CmdBox.TextStrokeTransparency = 0
+CmdBox.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+CmdBox.TextScaled = true
+
+Output.Name = "Output"
+Output.Parent = Frame
+Output.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Output.Position = UDim2.new(0.05, 0, 0.5, 0)
+Output.Size = UDim2.new(0.9, 0, 0.4, 0)
+Output.Font = Enum.Font.Legacy
+Output.Text = "Welcome to RYLQ's Admin!"
+Output.TextColor3 = Color3.fromRGB(0, 0, 0)
+Output.TextStrokeTransparency = 0
+Output.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+Output.TextScaled = true
+Output.TextWrapped = true
+
+-- Command list
+local commands = {
+    fly = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/1fg-dev/fe-fly-gui/main/source.lua"))()
+    end,
+    noclip = function()
+        local plr = game.Players.LocalPlayer
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        game:GetService("RunService").Stepped:Connect(function()
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                char.Humanoid:ChangeState(11)
+            end
+        end)
+    end,
+    speed = function()
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    end,
+    jump = function()
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = 120
+    end,
+    rejoin = function()
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+    end,
+    reset = function()
+        game.Players.LocalPlayer.Character:BreakJoints()
+    end,
+    sit = function()
+        game.Players.LocalPlayer.Character.Humanoid.Sit = true
+    end,
+    bring = function()
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                v.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
             end
         end
-    else
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
+    end,
+    kill = function()
+        local char = game.Players.LocalPlayer.Character
+        char:BreakJoints()
+    end,
+    tools = function()
+        for _, v in pairs(game:GetService("Lighting"):GetChildren()) do
+            if v:IsA("Tool") then
+                v.Parent = game.Players.LocalPlayer.Backpack
             end
         end
     end
-end
+}
 
--- Button actions
-buttonFly.MouseButton1Click:Connect(function()
-    flying = not flying
-    if flying then
-        fly()
+-- Command handler
+CmdBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local input = CmdBox.Text:lower()
+        if commands[input] then
+            Output.Text = "Running command: " .. input
+            commands[input]()
+        else
+            Output.Text = "Unknown command: " .. input
+        end
+        CmdBox.Text = ""
     end
 end)
-
-buttonSpeed.MouseButton1Click:Connect(function()
-    local speedInput = tonumber(game:GetService("UserInputService"):InputBegan:Wait())
-    if speedInput then
-        setSpeed(speedInput)
-    end
-end)
-
-buttonNoclip.MouseButton1Click:Connect(function()
-    toggleNoclip()
-end)
-
--- Toggle GUI visibility with "E" key
-local guiVisible = true
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.E then
-        guiVisible = not guiVisible
-        screenGui.Enabled = guiVisible
-    end
-end)
-
--- Set default speed and fly state
-setSpeed(16)
-fly()
