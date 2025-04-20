@@ -8,7 +8,7 @@ gui.ResetOnSpawn = false
 
 -- Create the main panel
 local panel = Instance.new("Frame", gui)
-panel.Size = UDim2.new(0, 300, 0, 400)
+panel.Size = UDim2.new(0, 300, 0, 500)  -- Increased size to accommodate more buttons
 panel.Position = UDim2.new(0.5, -150, 0.5, -200)
 panel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 panel.BorderSizePixel = 0
@@ -84,9 +84,20 @@ createButton("Toggle Fly", function()
 end)
 
 -- Function to change speed
+local playerSpeed = 16  -- Default speed in Roblox
 createButton("Increase Speed", function()
-    speed = speed + 10
-    print("Current Speed: " .. speed)
+    playerSpeed = playerSpeed + 5
+    player.Character.Humanoid.WalkSpeed = playerSpeed
+    print("Current Speed: " .. playerSpeed)
+end)
+
+createButton("Decrease Speed", function()
+    playerSpeed = playerSpeed - 5
+    if playerSpeed < 16 then
+        playerSpeed = 16  -- Prevent speed from going below the default
+    end
+    player.Character.Humanoid.WalkSpeed = playerSpeed
+    print("Current Speed: " .. playerSpeed)
 end)
 
 -- Function to toggle noclip (no collision with parts)
@@ -151,4 +162,3 @@ end)
 -- Make the admin panel draggable
 panel.Active = true
 panel.Draggable = true
-
