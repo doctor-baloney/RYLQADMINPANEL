@@ -1,125 +1,147 @@
--- RYLQ'S ADMIN PANEL (Custom Infinite Yield Style)
-if game.CoreGui:FindFirstChild("RYLQsAdmin") then
-    game.CoreGui:FindFirstChild("RYLQsAdmin"):Destroy()
+-- RYLQ'S ADMIN PANEL
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local guiOpen = true
+
+-- GUI Creation
+local adminGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+adminGui.Name = "RYLQ_Admin"
+adminGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", adminGui)
+mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+mainFrame.BorderSizePixel = 3
+mainFrame.Position = UDim2.new(0.1, 0, 0.3, 0)
+mainFrame.Size = UDim2.new(0, 300, 0, 300)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Text = "RYLQ'S ADMIN PANEL"
+title.Font = Enum.Font.Legacy
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+title.TextStrokeTransparency = 0
+title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+
+local commandBox = Instance.new("TextBox", mainFrame)
+commandBox.PlaceholderText = "Type command here..."
+commandBox.Font = Enum.Font.Legacy
+commandBox.TextSize = 18
+commandBox.Position = UDim2.new(0.05, 0, 0.8, 0)
+commandBox.Size = UDim2.new(0.9, 0, 0.15, 0)
+commandBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+commandBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+
+-- COMMANDS
+local function fly()
+	local torso = player.Character:WaitForChild("HumanoidRootPart")
+	local flying = true
+	local speed = 2
+	local bg = Instance.new("BodyGyro", torso)
+	local bv = Instance.new("BodyVelocity", torso)
+	bg.P = 9e4
+	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+	bg.CFrame = torso.CFrame
+	bv.Velocity = Vector3.new(0, 0, 0)
+	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+	
+	game:GetService("RunService").RenderStepped:Connect(function()
+		if flying then
+			local camCF = workspace.CurrentCamera.CFrame
+			bg.CFrame = camCF
+			bv.Velocity = camCF.lookVector * speed
+			player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
+		end
+	end)
+
+	mouse.KeyDown:Connect(function(k)
+		if k == "e" then
+			flying = not flying
+			if not flying then
+				bg:Destroy()
+				bv:Destroy()
+				player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+			end
+		elseif k == "z" then
+			speed = speed + 1
+		elseif k == "x" then
+			speed = speed - 1
+		end
+	end)
 end
 
--- UI Setup
-local RYLQAdmin = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local CmdBox = Instance.new("TextBox")
-local Output = Instance.new("TextLabel")
+local noclip = false
+game:GetService("RunService").Stepped:Connect(function()
+	if noclip and player.Character then
+		for _, part in pairs(player.Character:GetDescendants()) do
+			if part:IsA("BasePart") and part.CanCollide == true then
+				part.CanCollide = false
+			end
+		end
+	end
+end)
 
-RYLQAdmin.Name = "RYLQsAdmin"
-RYLQAdmin.ResetOnSpawn = false
-RYLQAdmin.Parent = game.CoreGui
-
-Frame.Name = "Main"
-Frame.Parent = RYLQAdmin
-Frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- RED theme
-Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.25, 0, 0.25, 0)
-Frame.Size = UDim2.new(0, 400, 0, 250)
-Frame.Active = true
-Frame.Draggable = true
-
-Title.Name = "Title"
-Title.Parent = Frame
-Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White bar
-Title.BorderSizePixel = 0
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Font = Enum.Font.Legacy
-Title.Text = "RYLQ'S ADMIN PANEL"
-Title.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text
-Title.TextStrokeTransparency = 0
-Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-Title.TextScaled = true
-
-CmdBox.Name = "CmdBox"
-CmdBox.Parent = Frame
-CmdBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CmdBox.Position = UDim2.new(0.05, 0, 0.25, 0)
-CmdBox.Size = UDim2.new(0.9, 0, 0, 40)
-CmdBox.Font = Enum.Font.Legacy
-CmdBox.PlaceholderText = "Enter a command..."
-CmdBox.Text = ""
-CmdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-CmdBox.TextStrokeTransparency = 0
-CmdBox.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-CmdBox.TextScaled = true
-
-Output.Name = "Output"
-Output.Parent = Frame
-Output.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Output.Position = UDim2.new(0.05, 0, 0.5, 0)
-Output.Size = UDim2.new(0.9, 0, 0.4, 0)
-Output.Font = Enum.Font.Legacy
-Output.Text = "Welcome to RYLQ's Admin!"
-Output.TextColor3 = Color3.fromRGB(0, 0, 0)
-Output.TextStrokeTransparency = 0
-Output.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-Output.TextScaled = true
-Output.TextWrapped = true
-
--- Command list
+-- Command Handler
 local commands = {
-    fly = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/1fg-dev/fe-fly-gui/main/source.lua"))()
-    end,
-    noclip = function()
-        local plr = game.Players.LocalPlayer
-        local char = plr.Character or plr.CharacterAdded:Wait()
-        game:GetService("RunService").Stepped:Connect(function()
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                char.Humanoid:ChangeState(11)
-            end
-        end)
-    end,
-    speed = function()
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
-    end,
-    jump = function()
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = 120
-    end,
-    rejoin = function()
-        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
-    end,
-    reset = function()
-        game.Players.LocalPlayer.Character:BreakJoints()
-    end,
-    sit = function()
-        game.Players.LocalPlayer.Character.Humanoid.Sit = true
-    end,
-    bring = function()
-        for _, v in pairs(game.Players:GetPlayers()) do
-            if v ~= game.Players.LocalPlayer then
-                v.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-            end
-        end
-    end,
-    kill = function()
-        local char = game.Players.LocalPlayer.Character
-        char:BreakJoints()
-    end,
-    tools = function()
-        for _, v in pairs(game:GetService("Lighting"):GetChildren()) do
-            if v:IsA("Tool") then
-                v.Parent = game.Players.LocalPlayer.Backpack
-            end
-        end
-    end
+	fly = function() fly() end,
+	noclip = function() noclip = not noclip end,
+	ws = function(v) player.Character.Humanoid.WalkSpeed = tonumber(v) end,
+	jp = function(v) player.Character.Humanoid.JumpPower = tonumber(v) end,
+	kill = function(v)
+		local target = game.Players:FindFirstChild(v)
+		if target and target.Character then
+			target.Character:BreakJoints()
+		end
+	end,
+	respawn = function()
+		local c = player.Character
+		local pos = c:FindFirstChild("HumanoidRootPart").CFrame
+		c:BreakJoints()
+		wait(1)
+		player.Character:MoveTo(pos.p)
+	end,
+	fling = function(v)
+		local target = game.Players:FindFirstChild(v)
+		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+			local body = Instance.new("BodyVelocity", target.Character.HumanoidRootPart)
+			body.Velocity = Vector3.new(9999, 9999, 9999)
+			body.MaxForce = Vector3.new(999999, 999999, 999999)
+			wait(0.5)
+			body:Destroy()
+		end
+	end,
+	sit = function() player.Character.Humanoid.Sit = true end,
+	reset = function() player:LoadCharacter() end,
+	bring = function(v)
+		local target = game.Players:FindFirstChild(v)
+		if target and target.Character then
+			target.Character:MoveTo(player.Character.HumanoidRootPart.Position + Vector3.new(3,0,0))
+		end
+	end,
 }
 
--- Command handler
-CmdBox.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local input = CmdBox.Text:lower()
-        if commands[input] then
-            Output.Text = "Running command: " .. input
-            commands[input]()
-        else
-            Output.Text = "Unknown command: " .. input
-        end
-        CmdBox.Text = ""
-    end
+commandBox.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		local msg = commandBox.Text
+		local args = string.split(msg, " ")
+		local cmd = args[1]:lower()
+		table.remove(args, 1)
+		if commands[cmd] then
+			commands[cmd](unpack(args))
+		end
+		commandBox.Text = ""
+	end
+end)
+
+-- GUI TOGGLE
+mouse.KeyDown:Connect(function(key)
+	if key:lower() == "e" then
+		guiOpen = not guiOpen
+		adminGui.Enabled = guiOpen
+	end
 end)
