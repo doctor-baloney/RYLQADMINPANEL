@@ -1,113 +1,147 @@
--- Admin Panel GUI Setup
-local Player = game.Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = PlayerGui
-ScreenGui.Name = "RYLQ_AdminPanel"
-ScreenGui.ResetOnSpawn = false
+-- Variables for GUI
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Black Background
-Frame.BorderSizePixel = 0
-Frame.Size = UDim2.new(0, 300, 0, 500)
-Frame.Position = UDim2.new(0, 20, 0, 100)
+local frame = Instance.new("Frame")
+frame.Parent = screenGui
+frame.Size = UDim2.new(0, 400, 0, 300)
+frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- black background
+frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- red border
 
-local Title = Instance.new("TextLabel")
-Title.Parent = Frame
-Title.Text = "RYLQ'S ADMIN PANEL"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)  -- White Text
-Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.Legacy
-Title.TextSize = 24
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.TextAlign = Enum.TextXAlignment.Center
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Size = UDim2.new(1, 0, 0, 50)
+title.BackgroundTransparency = 1
+title.Text = "RYLQ'S ADMIN PANEL"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 24
+title.Font = Enum.Font.Legacy
+title.TextAlign = Enum.TextAlign.Center
 
-local FlyButton = Instance.new("TextButton")
-FlyButton.Parent = Frame
-FlyButton.Text = "Fly"
-FlyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-FlyButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Button background black
-FlyButton.BorderColor3 = Color3.fromRGB(255, 0, 0)  -- Red Border
-FlyButton.Size = UDim2.new(0, 200, 0, 50)
-FlyButton.Position = UDim2.new(0, 50, 0, 100)
-FlyButton.Font = Enum.Font.Legacy
-FlyButton.TextSize = 18
+local buttonFly = Instance.new("TextButton")
+buttonFly.Parent = frame
+buttonFly.Size = UDim2.new(1, -20, 0, 50)
+buttonFly.Position = UDim2.new(0, 10, 0, 60)
+buttonFly.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+buttonFly.Text = "Toggle Fly"
+buttonFly.TextColor3 = Color3.fromRGB(255, 255, 255)
+buttonFly.TextSize = 20
+buttonFly.Font = Enum.Font.Legacy
 
-local SpeedButton = Instance.new("TextButton")
-SpeedButton.Parent = Frame
-SpeedButton.Text = "Speed"
-SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Button background black
-SpeedButton.BorderColor3 = Color3.fromRGB(255, 0, 0)  -- Red Border
-SpeedButton.Size = UDim2.new(0, 200, 0, 50)
-SpeedButton.Position = UDim2.new(0, 50, 0, 160)
-SpeedButton.Font = Enum.Font.Legacy
-SpeedButton.TextSize = 18
+local buttonSpeed = Instance.new("TextButton")
+buttonSpeed.Parent = frame
+buttonSpeed.Size = UDim2.new(1, -20, 0, 50)
+buttonSpeed.Position = UDim2.new(0, 10, 0, 120)
+buttonSpeed.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+buttonSpeed.Text = "Toggle Speed"
+buttonSpeed.TextColor3 = Color3.fromRGB(255, 255, 255)
+buttonSpeed.TextSize = 20
+buttonSpeed.Font = Enum.Font.Legacy
 
--- Fly Functionality
+local buttonNoclip = Instance.new("TextButton")
+buttonNoclip.Parent = frame
+buttonNoclip.Size = UDim2.new(1, -20, 0, 50)
+buttonNoclip.Position = UDim2.new(0, 10, 0, 180)
+buttonNoclip.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+buttonNoclip.Text = "Toggle Noclip"
+buttonNoclip.TextColor3 = Color3.fromRGB(255, 255, 255)
+buttonNoclip.TextSize = 20
+buttonNoclip.Font = Enum.Font.Legacy
+
+-- Variables for fly functionality
 local flying = false
+local speed = 0
+local flySpeed = 50
 local bodyGyro, bodyVelocity
-local speed = 50
-local ctrl = {f = 0, b = 0, l = 0, r = 0}
-local lastCtrl = {f = 0, b = 0, l = 0, r = 0}
 
-local function Fly()
-    local character = Player.Character
-    local humanoid = character and character:FindFirstChild("Humanoid")
-    local torso = character and character:FindFirstChild("HumanoidRootPart")
+-- Variables for noclip
+local noclip = false
 
-    if not humanoid or not torso then return end
-
-    bodyGyro = Instance.new("BodyGyro", torso)
-    bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-    bodyGyro.P = 10000
-    bodyGyro.CFrame = torso.CFrame
-
-    bodyVelocity = Instance.new("BodyVelocity", torso)
-    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-    bodyVelocity.Velocity = Vector3.new(0, 0.1, 0)
-
-    humanoid.PlatformStand = true
-
-    while flying do
-        wait(0.1)
-        local lookVector = game.Workspace.CurrentCamera.CFrame.lookVector
-        local moveVector = (lookVector * (ctrl.f + ctrl.b)) + ((game.Workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CFrame.p)
-        bodyVelocity.Velocity = moveVector * speed
-
-        if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-            speed = math.min(speed + 0.5 + (speed / 50), 100)
-        elseif ctrl.l + ctrl.r == 0 and ctrl.f + ctrl.b == 0 then
-            speed = math.max(speed - 1, 0)
-        end
-
-        bodyGyro.CFrame = game.Workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / 100), 0, 0)
+-- Fly function like Kohl's Admin
+local function fly()
+    local torso = player.Character:WaitForChild("HumanoidRootPart")
+    local humanoid = player.Character:WaitForChild("Humanoid")
+    
+    if flying then
+        bodyGyro = Instance.new("BodyGyro", torso)
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+        bodyGyro.CFrame = torso.CFrame
+        
+        bodyVelocity = Instance.new("BodyVelocity", torso)
+        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        
+        repeat wait()
+            humanoid.PlatformStand = true
+            bodyVelocity.Velocity = torso.CFrame.lookVector * flySpeed
+        until not flying
+        
+        bodyGyro:Destroy()
+        bodyVelocity:Destroy()
+        humanoid.PlatformStand = false
     end
-
-    bodyGyro:Destroy()
-    bodyVelocity:Destroy()
-    humanoid.PlatformStand = false
 end
 
-FlyButton.MouseButton1Click:Connect(function()
+-- Speed function to modify player walk speed
+local function setSpeed(value)
+    local humanoid = player.Character:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = value
+end
+
+-- Noclip function to enable/disable noclip mode
+local function toggleNoclip()
+    noclip = not noclip
+    local character = player.Character
+    local humanoid = character:WaitForChild("Humanoid")
+
+    if noclip then
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    else
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+-- Button actions
+buttonFly.MouseButton1Click:Connect(function()
     flying = not flying
     if flying then
-        Fly()
+        fly()
     end
 end)
 
-SpeedButton.MouseButton1Click:Connect(function()
-    speed = speed == 50 and 100 or 50  -- Toggle speed between 50 and 100
+buttonSpeed.MouseButton1Click:Connect(function()
+    local speedInput = tonumber(game:GetService("UserInputService"):InputBegan:Wait())
+    if speedInput then
+        setSpeed(speedInput)
+    end
 end)
 
--- GUI Toggle with E key
+buttonNoclip.MouseButton1Click:Connect(function()
+    toggleNoclip()
+end)
+
+-- Toggle GUI visibility with "E" key
 local guiVisible = true
 game:GetService("UserInputService").InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.E then
         guiVisible = not guiVisible
-        ScreenGui.Enabled = guiVisible
+        screenGui.Enabled = guiVisible
     end
 end)
 
--- Add more commands if needed
+-- Set default speed and fly state
+setSpeed(16)
+fly()
