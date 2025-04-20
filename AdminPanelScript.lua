@@ -1,4 +1,4 @@
--- RYLQ's Admin Panel by ChatGPT
+-- RYLQ's Admin Panel
 -- Works in Delta Executor (R6 only)
 
 local Players = game:GetService("Players")
